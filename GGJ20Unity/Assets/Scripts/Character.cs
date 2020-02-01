@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour, IOutlined
 {
     [SerializeField]
     private Animator animator = null;
@@ -19,7 +19,9 @@ public class Character : MonoBehaviour
     private bool selected = false;
     private bool moving = false;
     private bool repairing = false;
+    private bool outlined = false;
     private Machine targetMachine = null;
+    private Vector3 moveToPoint = default;
     private Vector3 initialLocalScale = default;
     
     void Start()
@@ -35,7 +37,7 @@ public class Character : MonoBehaviour
     public void SetSelected(bool setSelected)
     {
         selected = setSelected;
-        UpdateAnimationState();
+        UpdateRenderState();
     }
     
     public bool GetSelected()
@@ -46,13 +48,13 @@ public class Character : MonoBehaviour
     public void SetMoving(bool setMoving)
     {
         moving = setMoving;
-        UpdateAnimationState();
+        UpdateRenderState();
     }
     
     public void SetRepairing(bool setRepairing)
     {
         repairing = setRepairing;
-        UpdateAnimationState();
+        UpdateRenderState();
     }
     
     public void SetTargetMachine(Machine setTargetMachine)
@@ -73,12 +75,31 @@ public class Character : MonoBehaviour
         return targetMachine;
     }
     
-    private void UpdateAnimationState()
+    public void SetMoveToPoint(Vector3 setMoveToPoint)
+    {
+        moveToPoint = setMoveToPoint;
+    }
+    
+    public Vector3 GetMoveToPoint()
+    {
+        return moveToPoint;
+    }
+    
+    public void SetOutlined(bool setOutlined)
+    {
+        outlined = setOutlined;
+        UpdateRenderState();
+    }
+    
+    private void UpdateRenderState()
     {
         animator.SetBool("moving", moving);
         //animator.SetBool("repairing", repairing);
         
         status.SetSelected(selected);
         status.SetRepairing(repairing);
+        
+        GetComponentInChildren<cakeslice.Outline>().enabled = outlined || selected;
+        GetComponentInChildren<cakeslice.Outline>().color = selected ? 1 : 0;
     }
 }
