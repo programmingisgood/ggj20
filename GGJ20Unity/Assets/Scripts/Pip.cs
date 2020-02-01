@@ -5,6 +5,13 @@ using UnityEngine.UI;
 
 public class Pip : MonoBehaviour
 {
+    public enum State
+    {
+        Working,
+        Breaking,
+        Broken
+    };
+    
     [SerializeField]
     private Image icon = null;
     
@@ -14,8 +21,24 @@ public class Pip : MonoBehaviour
     [SerializeField]
     private Color workingColor = default;
     
-    public void SetBroken(bool setBroken)
+    [SerializeField]
+    private Color breakingColor = default;
+    
+    public void SetState(State setState)
     {
-        icon.color = setBroken ? brokenColor : workingColor;
+        switch (setState)
+        {
+            case State.Working:
+                icon.color = workingColor;
+                break;
+            
+            case State.Breaking:
+                icon.color = breakingColor;
+                break;
+            
+            case State.Broken:
+                icon.color = brokenColor;
+                break;
+        }
     }
 }
