@@ -27,6 +27,8 @@ public class GameController : MonoBehaviour
     
     private List<Character> characters = new List<Character>();
     private List<Machine> machines = new List<Machine>();
+    // A list of machines that have been repaired at least once.
+    private List<Machine> repairedMachines = new List<Machine>();
     // The outlined object under the cursor.
     private IOutlined outlined = null;
     
@@ -78,6 +80,8 @@ public class GameController : MonoBehaviour
         UpdateOutlines();
         
         UpdateCharacterMovement();
+        
+        UpdateMachineBreaking();
     }
     
     private void UpdateOutlines()
@@ -113,6 +117,7 @@ public class GameController : MonoBehaviour
     private void UpdateCharacterMovement()
     {
         bool atLeastOneRepairerActive = false;
+        int numCharsToAdd = 0;
         
         foreach (Character character in characters)
         {
@@ -127,6 +132,12 @@ public class GameController : MonoBehaviour
                     {
                         float repairAmount = character.GetRepairRate() * Time.deltaTime;
                         targetMachine.Repair(repairAmount);
+                        if (!targetMachine.GetIsBroken() && !repairedMachines.Contains(targetMachine))
+                        {
+                            repairedMachines.Add(targetMachine);
+                            // Reward with a new character.
+                            numCharsToAdd++;
+                        }
                         atLeastOneRepairerActive = true;
                         character.SetRepairing(atMachine);
                     }
@@ -155,8 +166,21 @@ public class GameController : MonoBehaviour
             }
         }
         
+        for (int i = 0; i < numCharsToAdd; i++)
+        {
+            CharacterEntersFactory();
+        }
+        
         float volumeDir = atLeastOneRepairerActive ? 1f : -1f;
         hammerAudioSource.volume = atLeastOneRepairerActive ? 1f : 0f;//hammerAudioSource.volume = Mathf.Clamp(hammerAudioSource.volume + volumeDir * Time.deltaTime * HammerVolumeChangeRate, 0f, 1f);
+    }
+    
+    private void UpdateMachineBreaking()
+    {
+        foreach (Machine machine in machines)
+        {
+            
+        }
     }
     
     private void ClearSelection()

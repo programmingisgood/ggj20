@@ -30,14 +30,11 @@ public class MachineStatus : MonoBehaviour
     
     private List<Pip> pips = new List<Pip>();
     
-    public void SetBroken(bool setBroken)
+    public void SetStatus(bool setBroken, float currentRepairLevel, float repairNeeded)
     {
         icon.sprite = setBroken ? brokenSprite : workingSprite;
         icon.color = setBroken ? brokenColor : workingColor;
-    }
-    
-    public void SetRepair(float currentRepairLevel, float repairNeeded)
-    {
+        
         int numPips = (int) (repairNeeded / PipsPerRepair);
         while (pips.Count < numPips)
         {
@@ -55,7 +52,9 @@ public class MachineStatus : MonoBehaviour
         int numRepairedPips = (int) (pips.Count * percentRepaired);
         for (int p = 0; p < pips.Count; p++)
         {
-            pips[p].SetBroken(p >= numRepairedPips);
+            bool pipWorking = p < numRepairedPips;
+            Pip.State pipState = pipWorking ? Pip.State.Working : (setBroken ? Pip.State.Broken : Pip.State.Breaking);
+            pips[p].SetState(pipState);
         }
     }
 }

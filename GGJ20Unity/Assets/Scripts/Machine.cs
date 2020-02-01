@@ -6,6 +6,9 @@ public class Machine : MonoBehaviour, IOutlined
 {
     private const float MachineVolumeChangeRate = 0.5f;
     
+    // The number of seconds this machine will run peacefully before starting to break.
+    private const float RepairBreakageSafetyBuffer = 12f;
+    
     [SerializeField]
     private Animator animator = null;
     
@@ -21,8 +24,13 @@ public class Machine : MonoBehaviour, IOutlined
     [SerializeField]
     private float repairNeeded = 100f;
     
+    [SerializeField, Tooltip("How many repair units break per second after being repaired.")]
+    private float breakRate = 1f;
+    
     private bool broken = true;
     private float currentRepairLevel = 0f;
+    // A buffer where the machine will not start to break.
+    private float breakageSafetyBufferRemaining = 0f;
     private bool outlined = false;
     
     void Start()
@@ -37,6 +45,7 @@ public class Machine : MonoBehaviour, IOutlined
         {
             currentRepairLevel = repairNeeded;
             broken = false;
+            breakageSafetyBufferRemaining = RepairBreakageSafetyBuffer;
         }
         
         UpdateRenderState();
@@ -65,6 +74,21 @@ public class Machine : MonoBehaviour, IOutlined
     
     private void Update()
     {
+        if (!broken)
+        {
+            breakageSafetyBufferRemaining = Mathf.Max(0f, breakageSafetyBufferRemaining - Time.deltaTime);
+            if (breakageSafetyBufferRemaining == 0f)
+            {
+                currentRepairLevel -= breakRate * Time.deltaTime;
+                if (currentRepairLevel <= 0f)
+                {
+                    currentRepairLevel = 0f;
+                    broken = true;
+                }
+                UpdateRenderState();
+            }
+        }
+        
         float volumeDir = broken ? -1f : 1f;
         audioSource.volume = broken ? 0f : 1f;//Mathf.Clamp(audioSource.volume + volumeDir * Time.deltaTime * MachineVolumeChangeRate, 0f, 1f);
     }
@@ -73,8 +97,7 @@ public class Machine : MonoBehaviour, IOutlined
     {
         //animator.SetBool("broken", broken);
         
-        status.SetBroken(broken);
-        status.SetRepair(currentRepairLevel, repairNeeded);
+        status.SetStatus(broken, currentRepairLevel, repairNeeded);
         GetComponentInChildren<cakeslice.Outline>().enabled = outlined;
     }
 }
