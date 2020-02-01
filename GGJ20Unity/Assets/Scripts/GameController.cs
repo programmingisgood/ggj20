@@ -5,12 +5,22 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     private const float AtTargetDistance = 1f;
+    private const float HammerVolumeChangeRate = 0.5f;
     
     [SerializeField]
     private Camera mainCamera = null;
     
     [SerializeField]
     private GameObject characterPrefab = null;
+    
+    [SerializeField]
+    private Transform spawnPoint = null;
+    
+    [SerializeField]
+    private Transform enterToPoint = null;
+    
+    [SerializeField]
+    private AudioSource hammerAudioSource = null;
     
     [SerializeField]
     private float charMoveSpeed = 1f;
@@ -22,12 +32,20 @@ public class GameController : MonoBehaviour
     
     void Start()
     {
-        GameObject newChar = Instantiate(characterPrefab);
-        characters.Add(newChar.GetComponent<Character>());
+        CharacterEntersFactory();
         
         machines = new List<Machine>(FindObjectsOfType<Machine>());
         
         ClearSelection();
+    }
+    
+    private void CharacterEntersFactory()
+    {
+        GameObject newCharGO = Instantiate(characterPrefab, spawnPoint.position, Quaternion.identity);
+        Character newChar = newCharGO.GetComponent<Character>();
+        characters.Add(newChar);
+        
+        newChar.SetMoveToPoint(enterToPoint.position);
     }
     
     void Update()
@@ -48,8 +66,12 @@ public class GameController : MonoBehaviour
                 {
                     Machine hitMachine = hit.transform.gameObject.GetComponentInParent<Machine>();
                     // Move selected characters to this machine.
-                    MoveSelectedToMachine(hitMachine);
+                    AssignSelectedTargetMachine(hitMachine);
                 }
+            }
+            else
+            {
+                ClearSelection();
             }
         }
         
@@ -73,7 +95,14 @@ public class GameController : MonoBehaviour
             outlined = hit.transform.gameObject.GetComponentInParent<IOutlined>();
             if (outlined != null)
             {
-                if (outlined is Machine && GetNumSelectedCharacters() > 0)
+                if (outlined is Machine)
+                {
+                    if (GetNumSelectedCharacters() > 0)
+                    {
+                        outlined.SetOutlined(true);
+                    }
+                }
+                else
                 {
                     outlined.SetOutlined(true);
                 }
@@ -83,6 +112,8 @@ public class GameController : MonoBehaviour
     
     private void UpdateCharacterMovement()
     {
+        bool atLeastOneRepairerActive = false;
+        
         foreach (Character character in characters)
         {
             Machine targetMachine = character.GetTargetMachine();
@@ -96,6 +127,7 @@ public class GameController : MonoBehaviour
                     {
                         float repairAmount = character.GetRepairRate() * Time.deltaTime;
                         targetMachine.Repair(repairAmount);
+                        atLeastOneRepairerActive = true;
                         character.SetRepairing(atMachine);
                     }
                     else
@@ -106,14 +138,25 @@ public class GameController : MonoBehaviour
                 else
                 {
                     character.transform.position += (targetMachine.GetMoveToPoint() - character.transform.position).normalized * Time.deltaTime * charMoveSpeed;
+                    character.SetRepairing(false);
                 }
             }
             else
             {
-                character.SetMoving(false);
                 character.SetRepairing(false);
+                if (Vector3.Distance(character.GetMoveToPoint(), character.transform.position) <= AtTargetDistance)
+                {
+                    character.SetMoving(false);
+                }
+                else
+                {
+                    character.transform.position += (character.GetMoveToPoint() - character.transform.position).normalized * Time.deltaTime * charMoveSpeed;
+                }
             }
         }
+        
+        float volumeDir = atLeastOneRepairerActive ? 1f : -1f;
+        hammerAudioSource.volume = atLeastOneRepairerActive ? 1f : 0f;//hammerAudioSource.volume = Mathf.Clamp(hammerAudioSource.volume + volumeDir * Time.deltaTime * HammerVolumeChangeRate, 0f, 1f);
     }
     
     private void ClearSelection()
@@ -137,7 +180,7 @@ public class GameController : MonoBehaviour
         return selected;
     }
     
-    private void MoveSelectedToMachine(Machine machine)
+    private void AssignSelectedTargetMachine(Machine machine)
     {
         foreach (Character character in characters)
         {

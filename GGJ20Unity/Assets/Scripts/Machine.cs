@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Machine : MonoBehaviour, IOutlined
 {
+    private const float MachineVolumeChangeRate = 0.5f;
+    
     [SerializeField]
     private Animator animator = null;
     
@@ -12,6 +14,9 @@ public class Machine : MonoBehaviour, IOutlined
     
     [SerializeField]
     private Transform moveToPoint = null;
+    
+    [SerializeField]
+    private AudioSource audioSource = null;
     
     [SerializeField]
     private float repairNeeded = 100f;
@@ -52,6 +57,18 @@ public class Machine : MonoBehaviour, IOutlined
         return moveToPoint.position;
     }
     
+    public void SetOutlined(bool setOutlined)
+    {
+        outlined = setOutlined;
+        UpdateRenderState();
+    }
+    
+    private void Update()
+    {
+        float volumeDir = broken ? -1f : 1f;
+        audioSource.volume = broken ? 0f : 1f;//Mathf.Clamp(audioSource.volume + volumeDir * Time.deltaTime * MachineVolumeChangeRate, 0f, 1f);
+    }
+    
     private void UpdateRenderState()
     {
         //animator.SetBool("broken", broken);
@@ -59,11 +76,5 @@ public class Machine : MonoBehaviour, IOutlined
         status.SetBroken(broken);
         status.SetRepair(currentRepairLevel, repairNeeded);
         GetComponentInChildren<cakeslice.Outline>().enabled = outlined;
-    }
-    
-    public void SetOutlined(bool setOutlined)
-    {
-        outlined = setOutlined;
-        UpdateRenderState();
     }
 }
