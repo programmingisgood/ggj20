@@ -310,10 +310,8 @@ public class GameController : MonoBehaviour
         
         victoryTimeRemaining = Mathf.Max(0f, victoryTimeRemaining);
         
-        if (victoryTimeRemaining <= 0f || Time.realtimeSinceStartup > 20f)
+        if (victoryTimeRemaining <= 0f)
         {
-            victoryTimeRemaining = 0f;
-            
             foreach (Machine machine in machines)
             {
                 machine.SetBreakageAllowed(false);
