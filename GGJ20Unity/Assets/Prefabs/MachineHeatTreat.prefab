@@ -42,6 +42,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: MachineHeatTreat
       objectReference: {fileID: 0}
+    - target: {fileID: 8795037399750440150, guid: bd207f19c9177264b8c5a41377b7fbba,
+        type: 3}
+      propertyPath: repairNeeded
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8795037399750440150, guid: bd207f19c9177264b8c5a41377b7fbba,
+        type: 3}
+      propertyPath: breakRate
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 8795037399750440151, guid: bd207f19c9177264b8c5a41377b7fbba,
         type: 3}
       propertyPath: m_LocalPosition.x
