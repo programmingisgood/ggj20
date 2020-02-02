@@ -24,6 +24,12 @@ public class GameController : MonoBehaviour
     private AudioSource hammerAudioSource = null;
     
     [SerializeField]
+    private AudioSource selectedAudioSource = null;
+    
+    [SerializeField]
+    private AudioSource confirmAudioSource = null;
+    
+    [SerializeField]
     private float charMoveSpeed = 1f;
     
     private List<Character> characters = new List<Character>();
@@ -63,6 +69,7 @@ public class GameController : MonoBehaviour
                     ClearSelection();
                     Character hitChar = hitObject.GetComponentInParent<Character>();
                     hitChar.SetSelected(true);
+                    selectedAudioSource.Play();
                 }
                 else if (hitObject.tag == "Machine")
                 {
@@ -261,6 +268,7 @@ public class GameController : MonoBehaviour
             {
                 character.SetTargetMachine(machine);
                 character.SetSelected(false);
+                confirmAudioSource.Play();
             }
         }
     }
