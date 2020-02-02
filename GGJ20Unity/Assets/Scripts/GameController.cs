@@ -20,7 +20,7 @@ public class GameController : MonoBehaviour
     private Transform spawnPoint = null;
     
     [SerializeField]
-    private Transform enterToPoint = null;
+    private List<Transform> enterToPoints = null;
     
     [SerializeField]
     private VictoryStatus victoryStatus = null;
@@ -69,7 +69,8 @@ public class GameController : MonoBehaviour
             Character newChar = newCharGO.GetComponent<Character>();
             characters.Add(newChar);
             
-            newChar.SetMoveToPoint(enterToPoint.position);
+            Vector3 closestEnterPoint = FindClosestEnterPoint(newChar.transform.position);
+            newChar.SetMoveToPoint(closestEnterPoint);
             
             entranceAudioSource.Play();
         }
@@ -212,11 +213,13 @@ public class GameController : MonoBehaviour
                                 numCharsToAdd++;
                             }
                             // Find all characters that are working on this machine and clear their target machine.
-                            foreach (Character checkMachineChacacter in characters)
+                            foreach (Character checkMachineCharacter in characters)
                             {
-                                if (checkMachineChacacter.GetTargetMachine() == targetMachine)
+                                if (checkMachineCharacter.GetTargetMachine() == targetMachine)
                                 {
-                                    checkMachineChacacter.SetTargetMachine(null);
+                                    checkMachineCharacter.SetTargetMachine(null);
+                                    Vector3 closestEnterPoint = FindClosestEnterPoint(checkMachineCharacter.transform.position);
+                                    checkMachineCharacter.SetMoveToPoint(closestEnterPoint);
                                 }
                             }
                         }
@@ -335,5 +338,22 @@ public class GameController : MonoBehaviour
                 confirmAudioSource.Play();
             }
         }
+    }
+    
+    private Vector3 FindClosestEnterPoint(Vector3 fromPoint)
+    {
+        Vector3 closestPoint = default;
+        float closestDist = float.MaxValue;
+        foreach (Transform enterToPoint in enterToPoints)
+        {
+            float dist = Vector3.Distance(enterToPoint.position, fromPoint);
+            if (dist < closestDist)
+            {
+                closestPoint = enterToPoint.position;
+                closestDist = dist;
+            }
+        }
+        
+        return closestPoint;
     }
 }
