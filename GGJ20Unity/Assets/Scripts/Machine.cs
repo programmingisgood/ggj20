@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Machine : MonoBehaviour, IOutlined
 {
-    private const float MachineVolumeChangeRate = 0.5f;
-    
     // The number of seconds this machine will run peacefully before starting to break.
     private const float RepairBreakageSafetyBuffer = 12f;
     
@@ -100,8 +98,7 @@ public class Machine : MonoBehaviour, IOutlined
             }
         }
         
-        float volumeDir = broken ? -1f : 1f;
-        audioSource.volume = broken ? 0f : 1f;//Mathf.Clamp(audioSource.volume + volumeDir * Time.deltaTime * MachineVolumeChangeRate, 0f, 1f);
+        audioSource.volume = broken ? 0f : 1f;
     }
     
     private void UpdateRenderState()

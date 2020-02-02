@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     private const float AtTargetDistance = 1f;
-    private const float HammerVolumeChangeRate = 0.5f;
     private const float RepelDistance = 1f;
     private const int MaxTownsfolk = 5;
     private const float VictoryTime = 30f;
@@ -269,8 +268,7 @@ public class GameController : MonoBehaviour
             CharacterEntersFactory();
         }
         
-        float volumeDir = atLeastOneRepairerActive ? 1f : -1f;
-        hammerAudioSource.volume = atLeastOneRepairerActive ? 1f : 0f;//hammerAudioSource.volume = Mathf.Clamp(hammerAudioSource.volume + volumeDir * Time.deltaTime * HammerVolumeChangeRate, 0f, 1f);
+        hammerAudioSource.volume = atLeastOneRepairerActive ? 1f : 0f;
     }
     
     private void RepelCharacters()
