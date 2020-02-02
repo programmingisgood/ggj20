@@ -72,6 +72,11 @@ public class Machine : MonoBehaviour, IOutlined
         UpdateRenderState();
     }
     
+    public bool GetOutlined()
+    {
+        return outlined;
+    }
+    
     private void Update()
     {
         if (!broken)

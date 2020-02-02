@@ -30,6 +30,12 @@ public class GameController : MonoBehaviour
     private AudioSource confirmAudioSource = null;
     
     [SerializeField]
+    private AudioSource entranceAudioSource = null;
+    
+    [SerializeField]
+    private AudioSource highlightAudioSource = null;
+    
+    [SerializeField]
     private float charMoveSpeed = 1f;
     
     private List<Character> characters = new List<Character>();
@@ -55,6 +61,8 @@ public class GameController : MonoBehaviour
         characters.Add(newChar);
         
         newChar.SetMoveToPoint(enterToPoint.position);
+        
+        entranceAudioSource.Play();
     }
     
     void Update()
@@ -92,11 +100,7 @@ public class GameController : MonoBehaviour
     
     private void UpdateOutlines()
     {
-        // Assume nothing is outlined by default.
-        if (outlined != null)
-        {
-            outlined.SetOutlined(false);
-        }
+        IOutlined prevOutlined = outlined;
         
         GameObject hitObject = FindObjectUnderMouse();
         if (hitObject != null)
@@ -104,18 +108,40 @@ public class GameController : MonoBehaviour
             outlined = hitObject.GetComponentInParent<IOutlined>();
             if (outlined != null)
             {
+                // We don't want to re-outline what is already outlined.
+                if (outlined == prevOutlined)
+                {
+                    return;
+                }
+                
                 if (outlined is Machine)
                 {
-                    if (GetNumSelectedCharacters() > 0)
+                    if (GetNumSelectedCharacters() > 0 && !outlined.GetOutlined())
                     {
                         outlined.SetOutlined(true);
+                        highlightAudioSource.Play();
                     }
                 }
-                else
+                else if (!outlined.GetOutlined())
                 {
                     outlined.SetOutlined(true);
+                    highlightAudioSource.Play();
                 }
             }
+            else
+            {
+                outlined = null;
+            }
+        }
+        else
+        {
+            outlined = null;
+        }
+        
+        // Assume nothing is outlined by default.
+        if (prevOutlined != null)
+        {
+            prevOutlined.SetOutlined(false);
         }
     }
     
@@ -129,8 +155,12 @@ public class GameController : MonoBehaviour
         {
             if (hit.transform.gameObject.tag == "Character")
             {
-                // Character is always the priority.
-                return hit.transform.gameObject;
+                // Only find characters if we don't have a character already selected.
+                if (GetNumSelectedCharacters() == 0)
+                {
+                    // Character is always the priority.
+                    return hit.transform.gameObject;
+                }
             }
             else if (hit.transform.gameObject.tag == "Machine")
             {

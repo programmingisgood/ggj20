@@ -100,6 +100,11 @@ public class Character : MonoBehaviour, IOutlined
         UpdateRenderState();
     }
     
+    public bool GetOutlined()
+    {
+        return outlined;
+    }
+    
     private void UpdateRenderState()
     {
         animator.SetBool("moving", moving);
