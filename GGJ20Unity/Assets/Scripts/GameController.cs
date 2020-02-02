@@ -6,6 +6,7 @@ public class GameController : MonoBehaviour
 {
     private const float AtTargetDistance = 1f;
     private const float HammerVolumeChangeRate = 0.5f;
+    private const float RepelDistance = 1f;
     
     [SerializeField]
     private Camera mainCamera = null;
@@ -54,19 +55,18 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
+            GameObject hitObject = FindObjectUnderMouse();
+            if (hitObject != null)
             {
-                if (hit.transform.gameObject.tag == "Character")
+                if (hitObject.tag == "Character")
                 {
                     ClearSelection();
-                    Character hitChar = hit.transform.gameObject.GetComponentInParent<Character>();
+                    Character hitChar = hitObject.GetComponentInParent<Character>();
                     hitChar.SetSelected(true);
                 }
-                else if (hit.transform.gameObject.tag == "Machine")
+                else if (hitObject.tag == "Machine")
                 {
-                    Machine hitMachine = hit.transform.gameObject.GetComponentInParent<Machine>();
+                    Machine hitMachine = hitObject.GetComponentInParent<Machine>();
                     // Move selected characters to this machine.
                     AssignSelectedTargetMachine(hitMachine);
                 }
@@ -80,8 +80,7 @@ public class GameController : MonoBehaviour
         UpdateOutlines();
         
         UpdateCharacterMovement();
-        
-        UpdateMachineBreaking();
+        RepelCharacters();
     }
     
     private void UpdateOutlines()
@@ -92,11 +91,10 @@ public class GameController : MonoBehaviour
             outlined.SetOutlined(false);
         }
         
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
+        GameObject hitObject = FindObjectUnderMouse();
+        if (hitObject != null)
         {
-            outlined = hit.transform.gameObject.GetComponentInParent<IOutlined>();
+            outlined = hitObject.GetComponentInParent<IOutlined>();
             if (outlined != null)
             {
                 if (outlined is Machine)
@@ -114,6 +112,28 @@ public class GameController : MonoBehaviour
         }
     }
     
+    private GameObject FindObjectUnderMouse()
+    {
+        GameObject returnHit = null;
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+        
+        foreach (RaycastHit hit in hits)
+        {
+            if (hit.transform.gameObject.tag == "Character")
+            {
+                // Character is always the priority.
+                return hit.transform.gameObject;
+            }
+            else if (hit.transform.gameObject.tag == "Machine")
+            {
+                returnHit = hit.transform.gameObject;
+            }
+        }
+        
+        return returnHit;
+    }
+    
     private void UpdateCharacterMovement()
     {
         bool atLeastOneRepairerActive = false;
@@ -125,18 +145,30 @@ public class GameController : MonoBehaviour
             if (targetMachine != null)
             {
                 bool atMachine = targetMachine.Distance(character) <= AtTargetDistance;
-                character.SetMoving(!atMachine);
+                character.SetMoving(!atMachine, targetMachine.transform.position);
                 if (atMachine)
                 {
                     if (targetMachine.GetIsBroken())
                     {
                         float repairAmount = character.GetRepairRate() * Time.deltaTime;
                         targetMachine.Repair(repairAmount);
-                        if (!targetMachine.GetIsBroken() && !repairedMachines.Contains(targetMachine))
+                        if (!targetMachine.GetIsBroken())
                         {
-                            repairedMachines.Add(targetMachine);
-                            // Reward with a new character.
-                            numCharsToAdd++;
+                            // Check if this was the first time this specific machine was repaired.
+                            if (!repairedMachines.Contains(targetMachine))
+                            {
+                                repairedMachines.Add(targetMachine);
+                                // Reward with a new character.
+                                numCharsToAdd++;
+                            }
+                            // Find all characters that are working on this machine and clear their target machine.
+                            foreach (Character checkMachineChacacter in characters)
+                            {
+                                if (checkMachineChacacter.GetTargetMachine() == targetMachine)
+                                {
+                                    checkMachineChacacter.SetTargetMachine(null);
+                                }
+                            }
                         }
                         atLeastOneRepairerActive = true;
                         character.SetRepairing(atMachine);
@@ -144,6 +176,7 @@ public class GameController : MonoBehaviour
                     else
                     {
                         character.SetRepairing(false);
+                        character.SetMoving(false, Vector3.zero);
                     }
                 }
                 else
@@ -157,10 +190,11 @@ public class GameController : MonoBehaviour
                 character.SetRepairing(false);
                 if (Vector3.Distance(character.GetMoveToPoint(), character.transform.position) <= AtTargetDistance)
                 {
-                    character.SetMoving(false);
+                    character.SetMoving(false, Vector3.zero);
                 }
                 else
                 {
+                    character.SetMoving(true, character.GetMoveToPoint());
                     character.transform.position += (character.GetMoveToPoint() - character.transform.position).normalized * Time.deltaTime * charMoveSpeed;
                 }
             }
@@ -175,11 +209,26 @@ public class GameController : MonoBehaviour
         hammerAudioSource.volume = atLeastOneRepairerActive ? 1f : 0f;//hammerAudioSource.volume = Mathf.Clamp(hammerAudioSource.volume + volumeDir * Time.deltaTime * HammerVolumeChangeRate, 0f, 1f);
     }
     
-    private void UpdateMachineBreaking()
+    private void RepelCharacters()
     {
-        foreach (Machine machine in machines)
+        foreach (Character character in characters)
         {
+            Vector3 repelDir = Vector3.zero;
+            // Check if this character is too close to another character and add to a repel direction.
+            foreach (Character closeCharacter in characters)
+            {
+                if (character != closeCharacter)
+                {
+                    float dist = Vector3.Distance(character.transform.position, closeCharacter.transform.position);
+                    if (dist <= RepelDistance)
+                    {
+                        repelDir += character.transform.position - closeCharacter.transform.position;
+                    }
+                }
+            }
             
+            repelDir.Normalize();
+            character.transform.position += repelDir * Time.deltaTime * (charMoveSpeed / 2f);
         }
     }
     
@@ -211,6 +260,7 @@ public class GameController : MonoBehaviour
             if (character.GetSelected())
             {
                 character.SetTargetMachine(machine);
+                character.SetSelected(false);
             }
         }
     }

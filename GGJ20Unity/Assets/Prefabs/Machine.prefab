@@ -493,6 +493,7 @@ MonoBehaviour:
   moveToPoint: {fileID: 577194524135860766}
   audioSource: {fileID: 7735398653558839567}
   repairNeeded: 100
+  breakRate: 1
 --- !u!1 &8795037400359564788
 GameObject:
   m_ObjectHideFlags: 0

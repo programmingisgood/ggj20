@@ -45,9 +45,21 @@ public class Character : MonoBehaviour, IOutlined
         return selected;
     }
     
-    public void SetMoving(bool setMoving)
+    public void SetMoving(bool setMoving, Vector3 movingToPoint)
     {
         moving = setMoving;
+        
+        if (moving)
+        {
+            // Determine which side of this character the machine is on.
+            Vector3 toPoint = (movingToPoint - transform.position).normalized;
+            Vector3 side = transform.right;
+            bool faceLeft = Vector3.Dot(side, toPoint) < 0f;
+            
+            // Face toward this machine.
+            rendererTrans.localScale = new Vector3(initialLocalScale.x * (faceLeft ? -1f : 1f), initialLocalScale.y, initialLocalScale.z);
+        }
+        
         UpdateRenderState();
     }
     
@@ -60,14 +72,6 @@ public class Character : MonoBehaviour, IOutlined
     public void SetTargetMachine(Machine setTargetMachine)
     {
         targetMachine = setTargetMachine;
-        
-        // Determine which side of this character the machine is on.
-        Vector3 toMachine = (setTargetMachine.transform.position - transform.position).normalized;
-        Vector3 side = transform.right;
-        bool faceLeft = Vector3.Dot(side, toMachine) < 0f;
-        
-        // Face toward this machine.
-        rendererTrans.localScale = new Vector3(initialLocalScale.x * (faceLeft ? -1f : 1f), initialLocalScale.y, initialLocalScale.z);
     }
     
     public Machine GetTargetMachine()
