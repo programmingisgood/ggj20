@@ -32,6 +32,7 @@ public class Machine : MonoBehaviour, IOutlined
     // A buffer where the machine will not start to break.
     private float breakageSafetyBufferRemaining = 0f;
     private bool outlined = false;
+    private bool breakageAllowed = true;
     
     void Start()
     {
@@ -66,6 +67,11 @@ public class Machine : MonoBehaviour, IOutlined
         return moveToPoint.position;
     }
     
+    public void SetBreakageAllowed(bool setBreakageAllowed)
+    {
+        breakageAllowed = setBreakageAllowed;
+    }
+    
     public void SetOutlined(bool setOutlined)
     {
         outlined = setOutlined;
@@ -82,7 +88,7 @@ public class Machine : MonoBehaviour, IOutlined
         if (!broken)
         {
             breakageSafetyBufferRemaining = Mathf.Max(0f, breakageSafetyBufferRemaining - Time.deltaTime);
-            if (breakageSafetyBufferRemaining == 0f)
+            if (breakageSafetyBufferRemaining == 0f && breakageAllowed)
             {
                 currentRepairLevel -= breakRate * Time.deltaTime;
                 if (currentRepairLevel <= 0f)

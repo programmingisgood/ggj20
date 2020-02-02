@@ -19,6 +19,7 @@ public class Character : MonoBehaviour, IOutlined
     private bool selected = false;
     private bool moving = false;
     private bool repairing = false;
+    private bool dancing = false;
     private bool outlined = false;
     private Machine targetMachine = null;
     private Vector3 moveToPoint = default;
@@ -87,6 +88,12 @@ public class Character : MonoBehaviour, IOutlined
         return repairing;
     }
     
+    public void SetDancing(bool setDancing)
+    {
+        dancing = setDancing;
+        UpdateRenderState();
+    }
+    
     public void SetTargetMachine(Machine setTargetMachine)
     {
         targetMachine = setTargetMachine;
@@ -123,6 +130,7 @@ public class Character : MonoBehaviour, IOutlined
         animator.SetBool("moving", moving);
         animator.SetBool("facing_forward", facingForward);
         animator.SetBool("repairing", repairing);
+        animator.SetBool("dancing", dancing);
         
         status.SetSelected(selected);
         status.SetRepairing(repairing);

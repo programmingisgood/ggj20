@@ -78,6 +78,11 @@ public class GameController : MonoBehaviour
     
     void Update()
     {
+        if (victoryTimeRemaining <= 0f)
+        {
+            return;
+        }
+        
         if (Input.GetMouseButtonDown(0))
         {
             GameObject hitObject = FindObjectUnderMouse();
@@ -301,6 +306,28 @@ public class GameController : MonoBehaviour
         if (allMachinesWorking)
         {
             victoryTimeRemaining -= Time.deltaTime;
+        }
+        
+        victoryTimeRemaining = Mathf.Max(0f, victoryTimeRemaining);
+        
+        if (victoryTimeRemaining <= 0f || Time.realtimeSinceStartup > 20f)
+        {
+            victoryTimeRemaining = 0f;
+            
+            foreach (Machine machine in machines)
+            {
+                machine.SetBreakageAllowed(false);
+            }
+            
+            // Dance time!
+            foreach (Character character in characters)
+            {
+                character.SetSelected(false);
+                character.SetOutlined(false);
+                character.SetRepairing(false);
+                character.SetMoving(false, Vector3.zero);
+                character.SetDancing(true);
+            }
         }
         
         victoryStatus.SetStatus(allMachinesWorking, Mathf.CeilToInt(victoryTimeRemaining));
