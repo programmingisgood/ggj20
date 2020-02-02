@@ -33,7 +33,7 @@ public class Character : MonoBehaviour, IOutlined
     
     void Start()
     {
-        Vector3 initLocalScale = rendererTrans.localScale;
+        Vector3 initLocalScale = new Vector3(1f, 2f, 1f);
         facingLeftScale = new Vector3(initLocalScale.x * -1f, initLocalScale.y, initLocalScale.z);
         facingRightScale = new Vector3(initLocalScale.x * 1f, initLocalScale.y, initLocalScale.z);
     }
@@ -138,6 +138,7 @@ public class Character : MonoBehaviour, IOutlined
         else
         {
             // Reset the offset when not repairing.
+            rendererTrans.localScale = facingLeft ? facingLeftScale : facingRightScale;
             rendererTrans.localPosition = initialRendererTransPos;
         }
     }
