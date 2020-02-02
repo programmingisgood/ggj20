@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class MachineStatus : MonoBehaviour
 {
-    private const float PipsPerRepair = 5f;
+    private const float PipsPerRepair = 12f;
     
     [SerializeField]
     private Image icon = null;
