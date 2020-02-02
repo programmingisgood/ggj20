@@ -22,12 +22,19 @@ public class Character : MonoBehaviour, IOutlined
     private bool outlined = false;
     private Machine targetMachine = null;
     private Vector3 moveToPoint = default;
-    private Vector3 initialLocalScale = default;
+    private bool facingLeft = true;
     private bool facingForward = true;
+    private Vector3 facingLeftScale = default;
+    private Vector3 facingRightScale = default;
+    private Vector3 repairScaleLeft = new Vector3(-1.6f, 3.8f, 1f);
+    private Vector3 repairScaleRight = new Vector3(1.6f, 3.8f, 1f);
+    private Vector3 repairOffset = new Vector3(0f, 1.9f, 0f);
     
     void Start()
     {
-        initialLocalScale = rendererTrans.localScale;
+        Vector3 initLocalScale = rendererTrans.localScale;
+        facingLeftScale = new Vector3(initLocalScale.x * -1f, initLocalScale.y, initLocalScale.z);
+        facingRightScale = new Vector3(initLocalScale.x * 1f, initLocalScale.y, initLocalScale.z);
     }
     
     public float GetRepairRate()
@@ -55,10 +62,10 @@ public class Character : MonoBehaviour, IOutlined
             // Determine which side of this character the machine is on.
             Vector3 toPoint = (movingToPoint - transform.position).normalized;
             Vector3 side = transform.right;
-            bool faceLeft = Vector3.Dot(side, toPoint) < 0f;
+            facingLeft = Vector3.Dot(side, toPoint) < 0f;
             
             // Face toward this machine.
-            rendererTrans.localScale = new Vector3(initialLocalScale.x * (faceLeft ? -1f : 1f), initialLocalScale.y, initialLocalScale.z);
+            rendererTrans.localScale = facingLeft ? facingLeftScale : facingRightScale;
             
             // Determine if we are moving toward the camera or away.
             Vector3 forward = transform.forward;
@@ -109,12 +116,32 @@ public class Character : MonoBehaviour, IOutlined
     {
         animator.SetBool("moving", moving);
         animator.SetBool("facing_forward", facingForward);
-        //animator.SetBool("repairing", repairing);
+        animator.SetBool("repairing", repairing);
         
         status.SetSelected(selected);
         status.SetRepairing(repairing);
         
         GetComponentInChildren<cakeslice.Outline>().enabled = outlined || selected;
         GetComponentInChildren<cakeslice.Outline>().color = selected ? 1 : 0;
+        //GetComponentInChildren<Renderer>().material.SetColor("Tint", selected ? Color.green : Color.yellow);
+        
+        if (repairing)
+        {
+            rendererTrans.localScale = facingLeft ? repairScaleLeft : repairScaleRight;
+        }
+        else
+        {
+            // Reset the offset when not repairing.
+            rendererTrans.localPosition = Vector3.zero;
+        }
+    }
+    
+    private void LateUpdate()
+    {
+        if (repairing)
+        {
+            rendererTrans.localScale = facingLeft ? repairScaleLeft : repairScaleRight;
+            rendererTrans.localPosition = repairOffset;
+        }
     }
 }
