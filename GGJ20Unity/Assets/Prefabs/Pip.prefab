@@ -125,3 +125,4 @@ MonoBehaviour:
   icon: {fileID: 4883429231860394398}
   brokenColor: {r: 1, g: 0, b: 0, a: 1}
   workingColor: {r: 0, g: 1, b: 0, a: 1}
+  breakingColor: {r: 1, g: 0.8519254, b: 0, a: 1}
