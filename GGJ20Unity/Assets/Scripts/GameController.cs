@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -24,6 +25,9 @@ public class GameController : MonoBehaviour
     
     [SerializeField]
     private VictoryStatus victoryStatus = null;
+    
+    [SerializeField]
+    private Canvas victoryCanvas = null;
     
     [SerializeField]
     private AudioSource hammerAudioSource = null;
@@ -104,7 +108,7 @@ public class GameController : MonoBehaviour
             }
             else
             {
-                ClearSelection();
+                //ClearSelection();
             }
         }
         
@@ -312,6 +316,8 @@ public class GameController : MonoBehaviour
         
         if (victoryTimeRemaining <= 0f)
         {
+            victoryCanvas.gameObject.SetActive(true);
+            
             foreach (Machine machine in machines)
             {
                 machine.SetBreakageAllowed(false);
@@ -380,5 +386,10 @@ public class GameController : MonoBehaviour
         }
         
         return closestPoint;
+    }
+    
+    public void GoToTitleScreen()
+    {
+        SceneManager.LoadScene("Title");
     }
 }
