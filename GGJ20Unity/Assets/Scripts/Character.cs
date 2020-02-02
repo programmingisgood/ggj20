@@ -23,6 +23,7 @@ public class Character : MonoBehaviour, IOutlined
     private Machine targetMachine = null;
     private Vector3 moveToPoint = default;
     private Vector3 initialLocalScale = default;
+    private bool facingForward = true;
     
     void Start()
     {
@@ -58,6 +59,10 @@ public class Character : MonoBehaviour, IOutlined
             
             // Face toward this machine.
             rendererTrans.localScale = new Vector3(initialLocalScale.x * (faceLeft ? -1f : 1f), initialLocalScale.y, initialLocalScale.z);
+            
+            // Determine if we are moving toward the camera or away.
+            Vector3 forward = transform.forward;
+            facingForward = Vector3.Dot(forward, toPoint) < 0f;
         }
         
         UpdateRenderState();
@@ -98,6 +103,7 @@ public class Character : MonoBehaviour, IOutlined
     private void UpdateRenderState()
     {
         animator.SetBool("moving", moving);
+        animator.SetBool("facing_forward", facingForward);
         //animator.SetBool("repairing", repairing);
         
         status.SetSelected(selected);
