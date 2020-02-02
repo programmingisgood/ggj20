@@ -22,6 +22,7 @@ public class Character : MonoBehaviour, IOutlined
     private bool outlined = false;
     private Machine targetMachine = null;
     private Vector3 moveToPoint = default;
+    private Vector3 initialRendererTransPos = new Vector3(0f, 1f, 0f);
     private bool facingLeft = true;
     private bool facingForward = true;
     private Vector3 facingLeftScale = default;
@@ -81,6 +82,11 @@ public class Character : MonoBehaviour, IOutlined
         UpdateRenderState();
     }
     
+    public bool GetRepairing()
+    {
+        return repairing;
+    }
+    
     public void SetTargetMachine(Machine setTargetMachine)
     {
         targetMachine = setTargetMachine;
@@ -132,7 +138,7 @@ public class Character : MonoBehaviour, IOutlined
         else
         {
             // Reset the offset when not repairing.
-            rendererTrans.localPosition = Vector3.zero;
+            rendererTrans.localPosition = initialRendererTransPos;
         }
     }
     

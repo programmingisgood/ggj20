@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
     private const float AtTargetDistance = 1f;
     private const float HammerVolumeChangeRate = 0.5f;
     private const float RepelDistance = 1f;
+    private const int MaxTownsfolk = 5;
     
     [SerializeField]
     private Camera mainCamera = null;
@@ -56,13 +57,16 @@ public class GameController : MonoBehaviour
     
     private void CharacterEntersFactory()
     {
-        GameObject newCharGO = Instantiate(characterPrefab, spawnPoint.position, Quaternion.identity);
-        Character newChar = newCharGO.GetComponent<Character>();
-        characters.Add(newChar);
-        
-        newChar.SetMoveToPoint(enterToPoint.position);
-        
-        entranceAudioSource.Play();
+        if (characters.Count < MaxTownsfolk)
+        {
+            GameObject newCharGO = Instantiate(characterPrefab, spawnPoint.position, Quaternion.identity);
+            Character newChar = newCharGO.GetComponent<Character>();
+            characters.Add(newChar);
+            
+            newChar.SetMoveToPoint(enterToPoint.position);
+            
+            entranceAudioSource.Play();
+        }
     }
     
     void Update()
@@ -156,7 +160,8 @@ public class GameController : MonoBehaviour
             if (hit.transform.gameObject.tag == "Character")
             {
                 // Only find characters if we don't have a character already selected.
-                if (GetNumSelectedCharacters() == 0)
+                // And we cannot select characters that are busy repairing.
+                if (GetNumSelectedCharacters() == 0 && !hit.transform.gameObject.GetComponentInParent<Character>().GetRepairing())
                 {
                     // Character is always the priority.
                     return hit.transform.gameObject;
@@ -209,6 +214,8 @@ public class GameController : MonoBehaviour
                         }
                         atLeastOneRepairerActive = true;
                         character.SetRepairing(atMachine);
+                        character.SetOutlined(false);
+                        character.SetSelected(false);
                     }
                     else
                     {

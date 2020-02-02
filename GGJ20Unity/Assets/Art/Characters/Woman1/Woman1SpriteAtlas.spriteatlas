@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Woman1SpriteAtlas
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 1
+      compressionQuality: 50
+      maxTextureSize: 2048
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 0
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 4
+      blockOffset: 1
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 1
+    variantMultiplier: 1
+    packables:
+    - {fileID: 2800000, guid: 329bcb046c96d1243be28b0813688166, type: 3}
+    - {fileID: 2800000, guid: 016d58331ea976045a9aa3b7a57754d1, type: 3}
+    - {fileID: 2800000, guid: 3c606c386144df74d82e78e951078576, type: 3}
+    - {fileID: 2800000, guid: 28c6543791540a44d8f667a5268b5384, type: 3}
+    - {fileID: 2800000, guid: ed111faca1080464ab2751e229f4df2a, type: 3}
+    - {fileID: 2800000, guid: 21a4922c777d1b54ab4d6f829f46be87, type: 3}
+    - {fileID: 2800000, guid: ccb5a47b2d0017343b6b893dae4b23fe, type: 3}
+    - {fileID: 2800000, guid: ae6163b1bc661f14eb0399286637159c, type: 3}
+    - {fileID: 2800000, guid: 2c8e52b520d5a0e4fbf1f955a84a4611, type: 3}
+    - {fileID: 2800000, guid: d7069b6bba434984aae622c4e3fc9ef1, type: 3}
+    - {fileID: 2800000, guid: 234e327c988cdf0458581f1b53cfdc65, type: 3}
+    - {fileID: 2800000, guid: c7172959691fdd844a76fb32f63b4762, type: 3}
+    - {fileID: 2800000, guid: 590000441c0c85844a7fa5c267a2b35e, type: 3}
+    totalSpriteSurfaceArea: 0
+    bindAsDefault: 1
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites: []
+  m_PackedSpriteNamesToIndex: []
+  m_Tag: Woman1SpriteAtlas
+  m_IsVariant: 0
