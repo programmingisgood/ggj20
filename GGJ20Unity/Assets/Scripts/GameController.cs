@@ -8,6 +8,7 @@ public class GameController : MonoBehaviour
     private const float HammerVolumeChangeRate = 0.5f;
     private const float RepelDistance = 1f;
     private const int MaxTownsfolk = 5;
+    private const float VictoryTime = 30f;
     
     [SerializeField]
     private Camera mainCamera = null;
@@ -20,6 +21,9 @@ public class GameController : MonoBehaviour
     
     [SerializeField]
     private Transform enterToPoint = null;
+    
+    [SerializeField]
+    private VictoryStatus victoryStatus = null;
     
     [SerializeField]
     private AudioSource hammerAudioSource = null;
@@ -45,12 +49,14 @@ public class GameController : MonoBehaviour
     private List<Machine> repairedMachines = new List<Machine>();
     // The outlined object under the cursor.
     private IOutlined outlined = null;
+    private float victoryTimeRemaining = 0f;
     
     void Start()
     {
         CharacterEntersFactory();
         
         machines = new List<Machine>(FindObjectsOfType<Machine>());
+        victoryTimeRemaining = VictoryTime;
         
         ClearSelection();
     }
@@ -100,6 +106,8 @@ public class GameController : MonoBehaviour
         
         UpdateCharacterMovement();
         RepelCharacters();
+        
+        UpdateVictoryProgress();
     }
     
     private void UpdateOutlines()
@@ -274,6 +282,25 @@ public class GameController : MonoBehaviour
             repelDir.Normalize();
             character.transform.position += repelDir * Time.deltaTime * (charMoveSpeed / 2f);
         }
+    }
+    
+    private void UpdateVictoryProgress()
+    {
+        bool allMachinesWorking = true;
+        foreach (Machine machine in machines)
+        {
+            if (machine.GetIsBroken())
+            {
+                allMachinesWorking = false;
+            }
+        }
+        
+        if (allMachinesWorking)
+        {
+            victoryTimeRemaining -= Time.deltaTime;
+        }
+        
+        victoryStatus.SetStatus(allMachinesWorking, Mathf.CeilToInt(victoryTimeRemaining));
     }
     
     private void ClearSelection()
