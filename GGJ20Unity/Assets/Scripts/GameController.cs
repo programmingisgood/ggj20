@@ -176,9 +176,8 @@ public class GameController : MonoBehaviour
         {
             if (hit.transform.gameObject.tag == "Character")
             {
-                // Only find characters if we don't have a character already selected.
                 // And we cannot select characters that are busy repairing.
-                if (GetNumSelectedCharacters() == 0 && !hit.transform.gameObject.GetComponentInParent<Character>().GetRepairing())
+                if (!hit.transform.gameObject.GetComponentInParent<Character>().GetRepairing())
                 {
                     // Character is always the priority.
                     return hit.transform.gameObject;
