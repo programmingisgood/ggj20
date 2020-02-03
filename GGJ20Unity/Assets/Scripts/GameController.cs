@@ -29,6 +29,9 @@ public class GameController : MonoBehaviour
     private Canvas victoryCanvas = null;
     
     [SerializeField]
+    private GameObject youWinImage = null;
+    
+    [SerializeField]
     private AudioSource hammerAudioSource = null;
     
     [SerializeField]
@@ -84,6 +87,13 @@ public class GameController : MonoBehaviour
         if (victoryTimeRemaining <= 0f)
         {
             return;
+        }
+        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            bool visible = victoryCanvas.gameObject.activeSelf;
+            victoryCanvas.gameObject.SetActive(!visible);
+            youWinImage.SetActive(false);
         }
         
         if (Input.GetMouseButtonDown(0))
@@ -314,6 +324,7 @@ public class GameController : MonoBehaviour
         if (victoryTimeRemaining <= 0f)
         {
             victoryCanvas.gameObject.SetActive(true);
+            youWinImage.SetActive(true);
             
             foreach (Machine machine in machines)
             {

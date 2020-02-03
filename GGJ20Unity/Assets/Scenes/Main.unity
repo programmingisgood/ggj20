@@ -287,6 +287,7 @@ MonoBehaviour:
   - {fileID: 1043569644}
   victoryStatus: {fileID: 990008157}
   victoryCanvas: {fileID: 1011372114}
+  youWinImage: {fileID: 304653155}
   hammerAudioSource: {fileID: 758013706}
   selectedAudioSource: {fileID: 1276930953}
   confirmAudioSource: {fileID: 37505257}
